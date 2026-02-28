@@ -235,59 +235,7 @@ graph TD
 
 ---
 
-## 📸 Exportar Diagrama como Imagem
 
-### Opção 1: Mermaid CLI
-
-```bash
-npm install -g @mermaid-js/mermaid-cli
-mmdc -i diagram.mmd -o diagram.png
-```
-
-### Opção 2: Online
-
-1. Acesse https://mermaid.live/
-2. Cole o código Mermaid
-3. Clique em "Download PNG/SVG"
-
-### Opção 3: No GitHub
-
-1. GitHub renderiza automaticamente
-2. Use screenshot tool (Win+Shift+S)
-
----
-
-## 🎨 Cores Utilizadas
-
-| Componente | Cor         | Hex     | Significado          |
-| ---------- | ----------- | ------- | -------------------- |
-| Lambda     | Laranja     | #FF9900 | AWS Lambda oficial   |
-| SQS        | Rosa        | #FF4F8B | AWS SQS oficial      |
-| DynamoDB   | Azul        | #4053D6 | AWS DynamoDB oficial |
-| S3         | Verde       | #569A31 | AWS S3 oficial       |
-| API        | Verde Claro | #68A063 | Express.js           |
-
----
-
-## 📱 Para Apresentações
-
-### PowerPoint/Google Slides
-
-- Use screenshot do diagrama renderizado no GitHub
-- Adicione animações nos passos numerados
-- Destaque cada serviço AWS com cores oficiais
-
-### Notion/Confluence
-
-- Importe o código Mermaid diretamente
-- Ambos suportam renderização nativa
-
-### PDF
-
-- Export do GitHub como imagem
-- Ou use Mermaid Live Editor para exportar SVG
-
----
 
 <div align="center">
 
