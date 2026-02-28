@@ -4,24 +4,6 @@
 
 O diagrama de arquitetura está embutido no [README.md](README.md) usando **Mermaid**, que o GitHub renderiza automaticamente.
 
-### Como Visualizar
-
-#### No GitHub
-
-1. Acesse o repositório no GitHub
-2. O README.md renderizará o diagrama automaticamente
-3. Cores e ícones são aplicados automaticamente
-
-#### Localmente (VS Code)
-
-1. Instale a extensão **Markdown Preview Mermaid Support**
-2. Abra o README.md
-3. Use `Ctrl+Shift+V` para preview
-
-#### Online (Mermaid Live Editor)
-
-1. Acesse: https://mermaid.live/
-2. Cole o código abaixo:
 
 ```mermaid
 graph TB
