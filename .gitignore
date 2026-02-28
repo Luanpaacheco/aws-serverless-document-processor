@@ -12,6 +12,26 @@ dist
 dist-ssr
 *.local
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# AWS & Credentials
+aws-credentials.json
+*.pem
+*.key
+config.json
+
+# Lambda build artifacts
+lambda/lambda.zip
+lambda/dist/
+*.zip
+
+# LocalStack data
+localstack/data/
+.localstack/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +42,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# OS
+Thumbs.db
+.DS_Store
