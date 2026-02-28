@@ -369,18 +369,6 @@ aws lambda list-event-source-mappings \
 
 ---
 
-## 🎯 Próximas Melhorias
-
-- [ ] Implementar Dead Letter Queue (DLQ)
-- [ ] Adicionar AWS X-Ray para tracing
-- [ ] CloudWatch Metrics e Alarms
-- [ ] API Gateway com autenticação Cognito
-- [ ] Step Functions para workflows complexos
-- [ ] S3 Event Notifications
-- [ ] Testes unitários e E2E
-- [ ] CI/CD com GitHub Actions
-
----
 
 ## 📜 Licença
 
