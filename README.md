@@ -18,7 +18,6 @@
 
 Sistema de **arquitetura event-driven** que demonstra boas práticas de desenvolvimento serverless na AWS. O projeto simula um fluxo completo de processamento de documentos acadêmicos, desde a requisição até a geração e armazenamento de PDFs, utilizando serviços gerenciados AWS.
 
-**Ideal para:** Portfólio profissional, estudos de arquitetura serverless, proof of concept e testes de integração.
 
 ### ✨ Diferenciais Técnicos
 
