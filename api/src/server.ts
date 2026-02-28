@@ -2,7 +2,6 @@ import express from "express";
 import { Request, Response } from "express";
 import AWS from "aws-sdk";
 import { v4 as uuidv4 } from "uuid";
-import { json } from "node:stream/consumers";
 
 const app = express();
 app.use(express.json());
@@ -11,12 +10,13 @@ const endpoint = process.env.AWS_ENDPOINT || "http://localhost:4566";
 
 const dynamo = new AWS.DynamoDB.DocumentClient({
   endpoint,
-  region: "us-esat-1",
+  region: "us-east-1",
 });
 
 const sqs = new AWS.SQS({ endpoint, region: "us-east-1" });
 
-const QUEUE_URL = "http://localhost:4566/000000000000/documents-queue";
+const QUEUE_URL =
+  process.env.QUEUE_URL || "http://localhost:4566/000000000000/documents-queue";
 
 app.post("/request-document", async (req: Request, res: Response) => {
   const { matricula } = req.body;
@@ -40,7 +40,7 @@ app.post("/request-document", async (req: Request, res: Response) => {
   }
 });
 
-app.get("request-document/:id", async (req: Request, res: Response) => {
+app.get("/request-document/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const result = await dynamo

@@ -1,9 +1,0 @@
-[
-  {
-    "matricula": "1001",
-    "nome": "João Silva",
-    "curso": "Engenharia de Software"
-  },
-  { "matricula": "1002", "nome": "Maria Souza", "curso": "Design Digital" },
-  { "matricula": "1003", "nome": "Pedro Lima", "curso": "Administração" }
-]

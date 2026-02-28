@@ -1,23 +1,25 @@
 {
   "name": "lambda",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Lambda function for PDF generation",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc",
+    "package": "powershell -ExecutionPolicy Bypass -File ./build-and-zip.ps1",
+    "install:types": "npm install --save-dev @types/node @types/pdfkit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
     "@types/aws-lambda": "^8.10.161",
+    "@types/node": "^25.3.2",
+    "@types/pdfkit": "^0.17.5",
     "aws-sdk": "^2.1693.0",
     "pdfkit": "^0.17.2"
   },
   "devDependencies": {
-    "@types/node": "^25.3.2",
-    "@types/pdfkit": "^0.17.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

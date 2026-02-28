@@ -1,0 +1,30 @@
+services:
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs,s3,dynamodb,lambda
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - LAMBDA_EXECUTOR=docker
+      - LAMBDA_REMOTE_DOCKER=false
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "./localstack/init.sh:/docker-entrypoint-initaws.d/init.sh"
+      - "./lambda/lambda.zip:/docker-entrypoint-initaws.d/lambda.zip"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./data:/tmp/localstack/data"
+
+  # API comentada temporariamente - descomente quando o Dockerfile estiver pronto
+  # api:
+  #   build:
+  #     context: ./api
+  #     dockerfile: DockerFile
+  #   environment:
+  #     - AWS_ENDPOINT=http://localstack:4566
+  #     - QUEUE_URL=http://localstack:4566/000000000000/documents-queue
+  #   depends_on:
+  #     - localstack
+  #   ports:
+  #     - "3000:3000"
