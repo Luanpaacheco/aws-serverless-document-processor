@@ -47,11 +47,11 @@ const JOBS_TABLE = process.env.JOBS_TABLE || "Jobs";
 // Handler principal
 export const handler = async (event: SQSEvent): Promise<void> => {
   console.log(`Processando ${event.Records.length} mensagens SQS`);
-  
+
   const results = await Promise.allSettled(
-    event.Records.map((record) => processRecord(record))
+    event.Records.map((record) => processRecord(record)),
   );
-  
+
   const failures = results.filter((r) => r.status === "rejected");
   if (failures.length > 0) {
     console.error(`${failures.length} mensagens falharam no processamento`);
@@ -61,18 +61,20 @@ export const handler = async (event: SQSEvent): Promise<void> => {
       }
     });
   }
-  
-  console.log(`Processamento concluído: ${results.length - failures.length} sucessos, ${failures.length} falhas`);
+
+  console.log(
+    `Processamento concluído: ${results.length - failures.length} sucessos, ${failures.length} falhas`,
+  );
 };
 
 // Processar um registro SQS
 async function processRecord(record: SQSRecord): Promise<void> {
   let jobId: string | undefined;
-  
+
   try {
     // Log do body recebido
     console.log(`[PROCESSAMENTO] Body recebido:`, record.body);
-    
+
     // Tentar fazer parse - pode estar duplamente serializado
     let message: SQSMessage;
     try {
@@ -82,51 +84,55 @@ async function processRecord(record: SQSRecord): Promise<void> {
       console.log("[PARSE] Tentando parse duplo...");
       message = JSON.parse(JSON.parse(record.body));
     }
-    
+
     jobId = message.jobId;
     const { matricula } = message;
-    
-    console.log(`[LAMBDA] Iniciando processamento Job=${jobId} Matricula=${matricula}`);
-    
+
+    console.log(
+      `[LAMBDA] Iniciando processamento Job=${jobId} Matricula=${matricula}`,
+    );
+
     // Atualizar status para PROCESSING
     console.log(`[DB] Atualizando status para PROCESSING...`);
     await updateJobStatus(jobId, "PROCESSING");
     console.log(`[DB] Status atualizado para PROCESSING`);
-    
+
     // Buscar aluno no DynamoDB
     console.log(`[DB] Buscando aluno matricula=${matricula}...`);
     const aluno = await getAluno(matricula);
-    console.log(`[DB] Resultado: ${aluno ? 'Encontrado' : 'Não encontrado'}`);
-    
+    console.log(`[DB] Resultado: ${aluno ? "Encontrado" : "Não encontrado"}`);
+
     if (!aluno) {
       throw new Error(`Aluno com matrícula ${matricula} não encontrado`);
     }
-    
+
     console.log(`[PDF] Aluno encontrado: ${aluno.nome}`);
-    
+
     // Gerar PDF em buffer
     console.log(`[PDF] Iniciando geração de PDF...`);
     const pdfBuffer = await generatePDF(aluno);
     console.log(`[PDF] PDF gerado com sucesso: ${pdfBuffer.length} bytes`);
-    
+
     // Salvar no S3
     const s3Key = `documents/${jobId}.pdf`;
     console.log(`[S3] Enviando PDF para ${s3Key}...`);
     await uploadToS3(s3Key, pdfBuffer);
     console.log(`[S3] PDF salvo com sucesso`);
-    
+
     // Atualizar status no DynamoDB
     console.log(`[DB] Atualizando status para COMPLETED...`);
     await updateJobCompleted(jobId, s3Key);
     console.log(`[SUCCESS] Job ${jobId} concluído com sucesso`);
-    
   } catch (error) {
     console.error(`[ERROR] Erro ao processar registro:`, error);
-    
+
     if (jobId) {
-      await markJobFailed(jobId, error instanceof Error ? error.message : "Erro desconhecido");
+      await markJobFailed(
+        jobId,
+        error instanceof Error ? error.message : "Erro desconhecido",
+      );
     }
-    
+
     throw error; // Re-throw para o Promise.allSettled
   }
 }
@@ -142,8 +148,8 @@ async function getAluno(matricula: string): Promise<Aluno | null> {
       })
       .promise();
     console.log(`[GET_ALUNO] Busca concluída`);
-    
-    return result.Item as Aluno || null;
+
+    return (result.Item as Aluno) || null;
   } catch (error) {
     console.error(`[GET_ALUNO] Erro:`, error);
     throw error;
@@ -153,7 +159,9 @@ async function getAluno(matricula: string): Promise<Aluno | null> {
 // Atualizar status do job
 async function updateJobStatus(jobId: string, status: string): Promise<void> {
   try {
-    console.log(`[UPDATE_STATUS] Iniciando update jobId=${jobId} status=${status}...`);
+    console.log(
+      `[UPDATE_STATUS] Iniciando update jobId=${jobId} status=${status}...`,
+    );
     const updateParams = {
       TableName: JOBS_TABLE,
       Key: { jobId },
@@ -164,8 +172,11 @@ async function updateJobStatus(jobId: string, status: string): Promise<void> {
         ":t": new Date().toISOString(),
       },
     };
-    console.log(`[UPDATE_STATUS] Parâmetros:`, JSON.stringify(updateParams).substring(0, 100));
-    
+    console.log(
+      `[UPDATE_STATUS] Parâmetros:`,
+      JSON.stringify(updateParams).substring(0, 100),
+    );
+
     await dynamo.update(updateParams).promise();
     console.log(`[UPDATE_STATUS] Update concluído`);
   } catch (error) {
@@ -175,9 +186,14 @@ async function updateJobStatus(jobId: string, status: string): Promise<void> {
 }
 
 // Marcar job como completo
-async function updateJobCompleted(jobId: string, pdfKey: string): Promise<void> {
+async function updateJobCompleted(
+  jobId: string,
+  pdfKey: string,
+): Promise<void> {
   try {
-    console.log(`[UPDATE_COMPLETED] Iniciando jobId=${jobId} pdfKey=${pdfKey}...`);
+    console.log(
+      `[UPDATE_COMPLETED] Iniciando jobId=${jobId} pdfKey=${pdfKey}...`,
+    );
     await dynamo
       .update({
         TableName: JOBS_TABLE,
@@ -199,7 +215,10 @@ async function updateJobCompleted(jobId: string, pdfKey: string): Promise<void> 
 }
 
 // Marcar job como falho
-async function markJobFailed(jobId: string, errorMessage: string): Promise<void> {
+async function markJobFailed(
+  jobId: string,
+  errorMessage: string,
+): Promise<void> {
   try {
     await dynamo
       .update({
@@ -214,7 +233,7 @@ async function markJobFailed(jobId: string, errorMessage: string): Promise<void>
         },
       })
       .promise();
-    
+
     console.log(`Job ${jobId} marcado como FAILED`);
   } catch (error) {
     console.error(`Erro ao marcar job como falho:`, error);
@@ -224,7 +243,9 @@ async function markJobFailed(jobId: string, errorMessage: string): Promise<void>
 // Upload para S3
 async function uploadToS3(key: string, buffer: Buffer): Promise<void> {
   try {
-    console.log(`[S3_UPLOAD] Iniciando envio bucket=${BUCKET_NAME} key=${key} size=${buffer.length}...`);
+    console.log(
+      `[S3_UPLOAD] Iniciando envio bucket=${BUCKET_NAME} key=${key} size=${buffer.length}...`,
+    );
     await s3
       .putObject({
         Bucket: BUCKET_NAME,
@@ -248,20 +269,20 @@ function generatePDF(aluno: Aluno): Promise<Buffer> {
         size: "A4",
         margins: { top: 50, bottom: 50, left: 50, right: 50 },
       });
-      
+
       const chunks: Buffer[] = [];
-      
+
       doc.on("data", (chunk: Buffer) => chunks.push(chunk));
       doc.on("end", () => resolve(Buffer.concat(chunks)));
       doc.on("error", reject);
-      
+
       // Cabeçalho
       doc
         .fontSize(20)
         .font("Helvetica-Bold")
         .text("DECLARAÇÃO DE MATRÍCULA", { align: "center" })
         .moveDown(2);
-      
+
       // Informações do aluno
       doc
         .fontSize(12)
@@ -272,40 +293,40 @@ function generatePDF(aluno: Aluno): Promise<Buffer> {
         .moveDown(0.5)
         .text(`Curso: ${aluno.curso}`)
         .moveDown(0.5);
-      
+
       if (aluno.email) {
         doc.text(`E-mail: ${aluno.email}`).moveDown(0.5);
       }
-      
+
       if (aluno.telefone) {
         doc.text(`Telefone: ${aluno.telefone}`).moveDown(0.5);
       }
-      
+
       // Texto da declaração
       doc
         .moveDown(2)
         .fontSize(11)
         .text(
           `Declaramos para os devidos fins que o(a) aluno(a) acima identificado(a) ` +
-          `está regularmente matriculado(a) nesta instituição no curso de ${aluno.curso}.`,
-          { align: "justify" }
+            `está regularmente matriculado(a) nesta instituição no curso de ${aluno.curso}.`,
+          { align: "justify" },
         )
         .moveDown(2);
-      
+
       // Data e local
       const dataAtual = new Date().toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "long",
         year: "numeric",
       });
-      
+
       doc
         .fontSize(10)
         .text(`Porto Alegre, ${dataAtual}`, { align: "center" })
         .moveDown(3)
         .text("_______________________________", { align: "center" })
         .text("Secretaria Acadêmica", { align: "center" });
-      
+
       // Rodapé
       doc
         .fontSize(8)
@@ -313,9 +334,9 @@ function generatePDF(aluno: Aluno): Promise<Buffer> {
           "Este documento foi gerado automaticamente e possui validade legal.",
           50,
           doc.page.height - 50,
-          { align: "center" }
+          { align: "center" },
         );
-      
+
       doc.end();
     } catch (error) {
       reject(error);

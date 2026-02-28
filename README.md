@@ -43,7 +43,7 @@ graph TB
     DynamoAlunos[(DynamoDB<br/>Alunos)]
     DynamoJobs[(DynamoDB<br/>Jobs)]
     S3[Amazon S3<br/>documents-bucket]
-    
+
     Client -->|POST /request-document| API
     API -->|1. Cria Job| DynamoJobs
     API -->|2. Envia mensagem| SQS
@@ -54,7 +54,7 @@ graph TB
     Lambda -->|7. Atualiza status| DynamoJobs
     Client -->|GET /request-document/:id| API
     API -->|8. Consulta status| DynamoJobs
-    
+
     style Lambda fill:#FF9900
     style SQS fill:#FF4F8B
     style DynamoAlunos fill:#4053D6
@@ -81,17 +81,20 @@ graph TB
 ## 🚀 Tecnologias Utilizadas
 
 ### Backend & Runtime
+
 - **Node.js 18.x** - Runtime JavaScript moderno
 - **TypeScript 5.9** - Type safety e melhor DX
 - **Express.js** - Framework web minimalista
 
 ### AWS Services (LocalStack)
+
 - **Lambda** - Função serverless (nodejs18.x, 512MB, 60s timeout)
 - **SQS** - Fila de mensagens para processamento assíncrono
 - **DynamoDB** - Banco NoSQL para dados de alunos e jobs
 - **S3** - Object storage para PDFs gerados
 
 ### Libraries & Tools
+
 - **PDFKit** - Geração de PDF em memória
 - **AWS SDK v2** - Integração com serviços AWS
 - **Docker & Docker Compose** - Containerização
@@ -103,6 +106,7 @@ graph TB
 ## 📸 Demonstração
 
 ### Exemplo de Requisição
+
 ```bash
 POST http://localhost:3000/request-document
 Content-Type: application/json
@@ -113,6 +117,7 @@ Content-Type: application/json
 ```
 
 ### Resposta Imediata
+
 ```json
 {
   "jobId": "e7a4b8b4-b915-4959-9a67-7b6a8a03fbca",
@@ -121,11 +126,13 @@ Content-Type: application/json
 ```
 
 ### Consulta de Status (após ~3 segundos)
+
 ```bash
 GET http://localhost:3000/request-document/e7a4b8b4-b915-4959-9a67-7b6a8a03fbca
 ```
 
 ### Resposta Final
+
 ```json
 {
   "matricula": "1001",
@@ -141,6 +148,7 @@ GET http://localhost:3000/request-document/e7a4b8b4-b915-4959-9a67-7b6a8a03fbca
 ## ⚡ Quick Start
 
 ### Pré-requisitos
+
 ```bash
 node --version    # 18.x ou superior
 docker --version  # Docker Desktop instalado
@@ -148,6 +156,7 @@ aws --version     # AWS CLI v2
 ```
 
 ### 1. Clone e instale dependências
+
 ```bash
 git clone <seu-repositorio>
 cd pucrs-docs-simulate
@@ -160,16 +169,19 @@ cd api && npm install && cd ..
 ```
 
 ### 2. Inicie o ambiente LocalStack
+
 ```bash
 docker-compose up -d
 ```
 
 ### 3. Configure recursos AWS (uma vez)
+
 ```bash
 powershell -ExecutionPolicy Bypass -File setup-all.ps1
 ```
 
 Este script cria automaticamente:
+
 - ✅ Bucket S3: `documents-bucket`
 - ✅ Tabela DynamoDB: `Alunos` (3 registros de teste)
 - ✅ Tabela DynamoDB: `Jobs` (tracking)
@@ -177,12 +189,14 @@ Este script cria automaticamente:
 - ✅ Lambda: `document-processor` + trigger
 
 ### 4. Inicie a API
+
 ```bash
 cd api
 npm run dev
 ```
 
 ### 5. Teste a aplicação
+
 Use Thunder Client, Postman ou curl:
 
 ```bash
@@ -234,6 +248,7 @@ pucrs-docs-simulate/
 ## 🔧 Configuração Avançada
 
 ### Variáveis de Ambiente (Lambda)
+
 ```bash
 AWS_ENDPOINT=http://host.docker.internal:4566
 BUCKET_NAME=documents-bucket
@@ -264,17 +279,18 @@ cd ../localstack
 
 ## 📊 Dados de Teste
 
-| Matrícula | Nome | Curso |
-|-----------|------|-------|
-| `1001` | João Silva | Engenharia de Software |
-| `1002` | Maria Souza | Design Digital |
-| `1003` | Pedro Lima | Administração |
+| Matrícula | Nome        | Curso                  |
+| --------- | ----------- | ---------------------- |
+| `1001`    | João Silva  | Engenharia de Software |
+| `1002`    | Maria Souza | Design Digital         |
+| `1003`    | Pedro Lima  | Administração          |
 
 ---
 
 ## 🎓 Conceitos Demonstrados
 
 ### Arquitetura & Padrões
+
 - ✅ **Event-Driven Architecture** - Desacoplamento via mensageria
 - ✅ **Serverless Computing** - Escalabilidade automática
 - ✅ **Async Processing** - Processamento não-bloqueante
@@ -282,6 +298,7 @@ cd ../localstack
 - ✅ **CQRS Light** - Separação comando/query
 
 ### Boas Práticas AWS
+
 - ✅ **IAC (Infrastructure as Code)** - Reprodutibilidade
 - ✅ **Least Privilege** - Permissões mínimas necessárias
 - ✅ **Idempotency** - Processamento seguro de mensagens
@@ -289,6 +306,7 @@ cd ../localstack
 - ✅ **Error Handling** - Tratamento robusto de falhas
 
 ### DevOps & Development
+
 - ✅ **Local Development** - Testes sem custo AWS
 - ✅ **Type Safety** - TypeScript end-to-end
 - ✅ **Containerization** - Docker para consistência
@@ -301,12 +319,14 @@ cd ../localstack
 Para migrar para AWS em produção:
 
 1. **Remover endpoint LocalStack**
+
 ```typescript
 // Remover do código:
-endpoint: 'http://host.docker.internal:4566'
+endpoint: "http://host.docker.internal:4566";
 ```
 
 2. **Criar recursos via CloudFormation/Terraform**
+
 ```bash
 # Exemplo com Terraform
 terraform init
@@ -315,6 +335,7 @@ terraform apply
 ```
 
 3. **Deploy da Lambda**
+
 ```bash
 aws lambda update-function-code \
   --function-name document-processor \
@@ -329,13 +350,17 @@ aws lambda update-function-code \
 ## 🔍 Troubleshooting
 
 ### Lambda fica em timeout?
+
 ✅ Verifique que `AWS_ENDPOINT=http://host.docker.internal:4566`
 
 ### "Cannot find module 'index'"?
+
 ✅ Rebuild Lambda: `cd lambda && npm run build`
 
 ### Status fica "pending" indefinidamente?
+
 ✅ Verifique trigger SQS:
+
 ```bash
 aws lambda list-event-source-mappings \
   --function-name document-processor \
